@@ -13,7 +13,7 @@ export default async function handler(req, res) {
 
   try {
     const { data, error } = await resend.emails.send({
-      from: 'onboarding@resend.dev', // ✅ Dominio temporal
+      from: 'onboarding@resend.dev', // ✅ Dominio temporal s
       to: ['contacto@lunaservicios.cl', email], // ✅ A Luna y al cliente
       subject: `🔔 Nueva reserva - ${name}`,
       html: `

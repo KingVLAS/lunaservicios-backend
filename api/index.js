@@ -9,7 +9,7 @@ const { Resend } = require('resend');
 const app = express();
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// --- Configuración de CORS mantenida para tu dominio de Hostinger ---
+// --- Configuración de CORS para tu dominio de Hostinger ---
 const corsOptions = {
   origin: 'https://deeppink-crab-363289.hostingersite.com'
 };
@@ -18,9 +18,15 @@ app.use(cors(corsOptions));
 
 app.use(express.json());
 
-// --- Define tus correos en constantes para fácil mantenimiento ---
-const COMPANY_EMAIL = 'apasep.ventas@gmail.com'; // Correo principal de la empresa
-const PERSONAL_COPY_EMAIL = 'vicente.empres4@gmail.com'; // Tu copia personal
+// --- CONSTANTES PARA LOS CORREOS ---
+const COMPANY_EMAIL = 'apasep.ventas@gmail.com';         // Correo principal de la empresa
+const PERSONAL_COPY_EMAIL = 'vicente.empres4@gmail.com';  // Tu copia personal
+
+// ---> IMPORTANTE: El correo del remitente DEBE usar tu dominio verificado: apasep.cl <---
+const SENDER_EMAIL_CONTACT = 'contacto@apasep.cl';
+const SENDER_EMAIL_BOOKING = 'agenda@apasep.cl';
+const SENDER_NAME = 'Luna Servicios'; // El nombre que verá el destinatario
+// -----------------------------------
 
 // Ruta para el formulario de contacto general
 app.post('/api/send-contact', async (req, res) => {
@@ -31,12 +37,10 @@ app.post('/api/send-contact', async (req, res) => {
     }
 
     const { data, error } = await resend.emails.send({
-      // --- CORRECCIÓN: Usar tu dominio verificado como remitente ---
-      // Reemplaza 'lunaservicios.cl' si tu dominio verificado es otro.
-      from: `Contacto - Luna Servicios <vichonae@gmail.com>`, 
-      
-      // --- CORRECCIÓN: Enviar correo a la empresa, a ti y al cliente ---
+      // --- CORRECCIÓN DEFINITIVA ---
+      from: `${SENDER_NAME} <${SENDER_EMAIL_CONTACT}>`,
       to: [COMPANY_EMAIL, PERSONAL_COPY_EMAIL, email],
+      // -----------------------------
       
       subject: `Nuevo Mensaje de Contacto de: ${name}`,
       html: `
@@ -58,7 +62,8 @@ app.post('/api/send-contact', async (req, res) => {
 
     if (error) {
       console.error({ error });
-      return res.status(500).json({ error: 'Error al enviar el correo.' });
+      // Enviamos el error de Resend al frontend para un mejor diagnóstico
+      return res.status(500).json({ error: 'Error al enviar el correo.', details: error.message });
     }
     res.status(200).json({ message: 'Correo enviado con éxito!', data });
   } catch (error) {
@@ -79,12 +84,10 @@ app.post('/api/send-booking', async (req, res) => {
     });
 
     const { data, error } = await resend.emails.send({
-      // --- CORRECCIÓN: Usar tu dominio verificado como remitente ---
-      // Reemplaza 'lunaservicios.cl' si tu dominio verificado es otro.
-      from: `Agenda - Luna Servicios <agenda@lunaservicios.cl>`,
-      
-      // --- CORRECCIÓN: Enviar correo a la empresa, a ti y al cliente ---
+      // --- CORRECCIÓN DEFINITIVA ---
+      from: `${SENDER_NAME} <${SENDER_EMAIL_BOOKING}>`,
       to: [COMPANY_EMAIL, PERSONAL_COPY_EMAIL, email],
+      // -----------------------------
 
       subject: `Confirmación de Solicitud de Reunión de: ${name}`,
       html: `
@@ -103,7 +106,8 @@ app.post('/api/send-booking', async (req, res) => {
 
     if (error) {
       console.error({ error });
-      return res.status(500).json({ error: 'Error al enviar la notificación de reserva.' });
+      // Enviamos el error de Resend al frontend para un mejor diagnóstico
+      return res.status(500).json({ error: 'Error al enviar la notificación de reserva.', details: error.message });
     }
     res.status(200).json({ message: 'Reserva notificada con éxito!', data });
   } catch (error) {

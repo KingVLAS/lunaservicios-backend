@@ -9,14 +9,10 @@ const { Resend } = require('resend');
 const app = express();
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// --- CAMBIO IMPORTANTE: Configuración de CORS ---
-// Le decimos a nuestro backend que solo acepte peticiones
-// desde la URL de tu sitio en Hostinger.
 const corsOptions = {
   origin: 'https://deeppink-crab-363289.hostingersite.com'
 };
 app.use(cors(corsOptions));
-// --------------------------------------------------
 
 app.use(express.json());
 
@@ -29,12 +25,26 @@ app.post('/api/send-contact', async (req, res) => {
     }
 
     const { data, error } = await resend.emails.send({
-      // --- CAMBIO IMPORTANTE PARA PRUEBAS ---
-      from: 'Contacto Web <onboarding@resend.dev>', 
-      // ------------------------------------
-      to: ['apasep.ventas@gmail.com'], // Usa el email con el que creaste tu cuenta de Resend
+      from: 'Contacto Web <onboarding@resend.dev>',
+      // --- CORRECCIÓN 1: Enviar correo a ti Y al cliente ---
+      to: ['apasep.ventas@gmail.com', email], 
       subject: `Nuevo Mensaje de Contacto de: ${name}`,
-      html: `... (el contenido del HTML no cambia) ...`,
+      // --- CORRECCIÓN 2: Contenido HTML real ---
+      html: `
+        <h1>Nueva Consulta desde tu Sitio Web</h1>
+        <p>Has recibido un nuevo mensaje a través del formulario de contacto.</p>
+        <hr>
+        <h3>Detalles del Contacto:</h3>
+        <ul>
+          <li><strong>Nombre:</strong> ${name}</li>
+          <li><strong>Email:</strong> ${email}</li>
+          <li><strong>Servicio de Interés:</strong> ${service}</li>
+        </ul>
+        <h3>Mensaje:</h3>
+        <p>${message}</p>
+        <hr>
+        <p><small>Este es un correo automático enviado desde tu sitio web.</small></p>
+      `,
     });
 
     if (error) {
@@ -60,12 +70,25 @@ app.post('/api/send-booking', async (req, res) => {
     });
 
     const { data, error } = await resend.emails.send({
-      // --- CAMBIO IMPORTANTE PARA PRUEBAS ---
       from: 'Agenda de Reuniones <onboarding@resend.dev>',
-      // ------------------------------------
-      to: ['TU_EMAIL_DE_REGISTRO_EN_RESEND@ejemplo.com'], // Usa el email con el que creaste tu cuenta de Resend
+      // --- CORRECCIÓN 1: Enviar correo a ti Y al cliente ---
+      to: ['apasep.ventas@gmail.com', email],
       subject: `Nueva Solicitud de Reunión de: ${name}`,
-      html: `... (el contenido del HTML no cambia) ...`,
+      // --- CORRECCIÓN 2: Contenido HTML real ---
+      html: `
+        <h1>Nueva Solicitud de Reunión</h1>
+        <p>Has recibido una nueva solicitud de reunión desde tu sitio web.</p>
+        <hr>
+        <h3>Detalles de la Solicitud:</h3>
+        <ul>
+          <li><strong>Nombre:</strong> ${name}</li>
+          <li><strong>Email:</strong> ${email}</li>
+          <li><strong>Fecha Solicitada:</strong> ${meetingDate}</li>
+          <li><strong>Hora Solicitada:</strong> ${selectedTime}</li>
+        </ul>
+        <hr>
+        <p><small>Este es un correo automático enviado desde tu sitio web. Por favor, contacta al solicitante para confirmar la disponibilidad.</small></p>
+      `,
     });
 
     if (error) {

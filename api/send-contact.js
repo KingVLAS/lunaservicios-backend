@@ -10,17 +10,17 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // --- Preflight ---
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
-  // --- Solo permitir POST ---
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Método no permitido' });
   }
 
   const { name, email, service, message } = req.body;
+
+  console.log('Datos recibidos:', { name, email, service, message });
 
   try {
     const { data, error } = await resend.emails.send({
@@ -41,9 +41,8 @@ export default async function handler(req, res) {
     if (error) return res.status(500).json({ error });
 
     return res.status(200).json({ success: true, data });
-   } catch (err) {
-    console.error('Error al enviar correo:', err); // 👈 Agregado para depurar
+  } catch (err) {
+    console.error('Error al enviar correo:', err);
     return res.status(500).json({ error: err.message });
   }
 }
-

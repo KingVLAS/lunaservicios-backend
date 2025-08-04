@@ -33,7 +33,7 @@ app.post('/api/send-contact', async (req, res) => {
     const { data, error } = await resend.emails.send({
       // --- CORRECCIÓN: Usar tu dominio verificado como remitente ---
       // Reemplaza 'lunaservicios.cl' si tu dominio verificado es otro.
-      from: `Contacto - Luna Servicios <contacto@lunaservicios.cl>`, 
+      from: `Contacto - Luna Servicios <vichonae@gmail.com>`, 
       
       // --- CORRECCIÓN: Enviar correo a la empresa, a ti y al cliente ---
       to: [COMPANY_EMAIL, PERSONAL_COPY_EMAIL, email],

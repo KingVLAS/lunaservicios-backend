@@ -41,7 +41,9 @@ export default async function handler(req, res) {
     if (error) return res.status(500).json({ error });
 
     return res.status(200).json({ success: true, data });
-  } catch (err) {
+   } catch (err) {
+    console.error('Error al enviar correo:', err); // 👈 Agregado para depurar
     return res.status(500).json({ error: err.message });
   }
 }
+

@@ -1,5 +1,3 @@
-// lunaservicios-backend/api/send-contact.js
-
 import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -13,7 +11,7 @@ export default async function handler(req, res) {
 
   try {
     const { data, error } = await resend.emails.send({
-      from: 'onboarding@resend.dev', // Puedes cambiarlo si ya verificaste tu dominio
+      from: 'onboarding@resend.dev', // Usa este mientras no verifiques dominio
       to: ['contacto@lunaservicios.cl', email],
       subject: `📩 Nueva consulta - ${name}`,
       html: `
@@ -28,14 +26,10 @@ export default async function handler(req, res) {
       `,
     });
 
-    if (error) {
-      console.error('Resend error:', error);
-      return res.status(500).json({ error });
-    }
+    if (error) return res.status(500).json({ error });
 
     return res.status(200).json({ success: true, data });
   } catch (err) {
-    console.error('Unexpected error:', err);
     return res.status(500).json({ error: err.message });
   }
 }

@@ -9,12 +9,18 @@ const { Resend } = require('resend');
 const app = express();
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+// --- Configuración de CORS mantenida para tu dominio de Hostinger ---
 const corsOptions = {
   origin: 'https://deeppink-crab-363289.hostingersite.com'
 };
 app.use(cors(corsOptions));
+// -------------------------------------------------------------------
 
 app.use(express.json());
+
+// --- Define tus correos en constantes para fácil mantenimiento ---
+const COMPANY_EMAIL = 'apasep.ventas@gmail.com'; // Correo principal de la empresa
+const PERSONAL_COPY_EMAIL = 'vicente.empres4@gmail.com'; // Tu copia personal
 
 // Ruta para el formulario de contacto general
 app.post('/api/send-contact', async (req, res) => {
@@ -25,11 +31,14 @@ app.post('/api/send-contact', async (req, res) => {
     }
 
     const { data, error } = await resend.emails.send({
-      from: 'Contacto Web <onboarding@resend.dev>',
-      // --- CORRECCIÓN 1: Enviar correo a ti Y al cliente ---
-      to: ['apasep.ventas@gmail.com', email], 
+      // --- CORRECCIÓN: Usar tu dominio verificado como remitente ---
+      // Reemplaza 'lunaservicios.cl' si tu dominio verificado es otro.
+      from: `Contacto - Luna Servicios <contacto@lunaservicios.cl>`, 
+      
+      // --- CORRECCIÓN: Enviar correo a la empresa, a ti y al cliente ---
+      to: [COMPANY_EMAIL, PERSONAL_COPY_EMAIL, email],
+      
       subject: `Nuevo Mensaje de Contacto de: ${name}`,
-      // --- CORRECCIÓN 2: Contenido HTML real ---
       html: `
         <h1>Nueva Consulta desde tu Sitio Web</h1>
         <p>Has recibido un nuevo mensaje a través del formulario de contacto.</p>
@@ -70,24 +79,25 @@ app.post('/api/send-booking', async (req, res) => {
     });
 
     const { data, error } = await resend.emails.send({
-      from: 'Agenda de Reuniones <onboarding@resend.dev>',
-      // --- CORRECCIÓN 1: Enviar correo a ti Y al cliente ---
-      to: ['apasep.ventas@gmail.com', email],
-      subject: `Nueva Solicitud de Reunión de: ${name}`,
-      // --- CORRECCIÓN 2: Contenido HTML real ---
+      // --- CORRECCIÓN: Usar tu dominio verificado como remitente ---
+      // Reemplaza 'lunaservicios.cl' si tu dominio verificado es otro.
+      from: `Agenda - Luna Servicios <agenda@lunaservicios.cl>`,
+      
+      // --- CORRECCIÓN: Enviar correo a la empresa, a ti y al cliente ---
+      to: [COMPANY_EMAIL, PERSONAL_COPY_EMAIL, email],
+
+      subject: `Confirmación de Solicitud de Reunión de: ${name}`,
       html: `
-        <h1>Nueva Solicitud de Reunión</h1>
-        <p>Has recibido una nueva solicitud de reunión desde tu sitio web.</p>
+        <h1>Confirmación de Solicitud de Reunión</h1>
+        <p>Hola ${name}, hemos recibido tu solicitud de reunión para la siguiente fecha y hora. Un especialista revisará la disponibilidad y se pondrá en contacto contigo a la brevedad.</p>
         <hr>
-        <h3>Detalles de la Solicitud:</h3>
+        <h3>Detalles de tu Solicitud:</h3>
         <ul>
-          <li><strong>Nombre:</strong> ${name}</li>
-          <li><strong>Email:</strong> ${email}</li>
           <li><strong>Fecha Solicitada:</strong> ${meetingDate}</li>
           <li><strong>Hora Solicitada:</strong> ${selectedTime}</li>
         </ul>
         <hr>
-        <p><small>Este es un correo automático enviado desde tu sitio web. Por favor, contacta al solicitante para confirmar la disponibilidad.</small></p>
+        <p><small>Este es un correo automático de confirmación enviado desde tu sitio web.</small></p>
       `,
     });
 

@@ -24,7 +24,7 @@ export default async function handler(req, res) {
 
   try {
     const { data, error } = await resend.emails.send({
-      from: 'notificaciones@lunaservicios.cl',
+      from: 'onboarding@resend.dev', // ✅ Dominio temporal
       to: ['contacto@lunaservicios.cl', email],
       subject: `📩 Nueva consulta - ${name}`,
       html: `
